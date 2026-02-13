@@ -124,9 +124,3 @@ The models are evaluated using the following metrics on a held-out test set:
 * **Precision & Recall (Weighted)**
 
 Evaluation is performed automatically after training completes. Best checkpoints are saved based on the **F1-Score**.
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
-```
-
-```
