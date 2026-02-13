@@ -38,7 +38,7 @@ This repository contains the implementation for predicting short-form video popu
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/Kartik-Swt/Short-Video-Popularity-Prediction-Using-Spatio-Temporal-Transformers-and-VLMs.git
+git clone https://github.com/Kartik-Swt/Short-Video-Popularity-Prediction-Using-Video-Transformers-and-VLMs.git
 cd video-popularity-prediction
 
 ```
