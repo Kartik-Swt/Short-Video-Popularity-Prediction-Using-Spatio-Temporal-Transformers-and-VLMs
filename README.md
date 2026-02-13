@@ -38,7 +38,7 @@ This repository contains the implementation for predicting short-form video popu
 
 1. **Clone the repository:**
 ```bash
-git clone [https://github.com/Kartik-Swt/video-popularity-prediction.git](https://github.com/Kartik-Swt/video-popularity-prediction.git)
+git clone [https://github.com/Kartik-Swt/Short-Video-Popularity-Prediction-Using-Spatio-Temporal-Transformers-and-VLMs.git](https://github.com/Kartik-Swt/Short-Video-Popularity-Prediction-Using-Spatio-Temporal-Transformers-and-VLMs.git)
 cd video-popularity-prediction
 
 ```
@@ -124,22 +124,6 @@ The models are evaluated using the following metrics on a held-out test set:
 * **Precision & Recall (Weighted)**
 
 Evaluation is performed automatically after training completes. Best checkpoints are saved based on the **F1-Score**.
-
-## 📜 Citation
-
-If you use this code or dataset in your research, please cite our paper:
-
-```bibtex
-@article{yourname2026video,
-  title={Multimodal Popularity Prediction in Short-form Videos},
-  author={Kartikeya, Name2, Name3},
-  journal={arXiv preprint arXiv:26XX.XXXXX},
-  year={2026}
-}
-
-```
-
-## ⚖️ License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
 
