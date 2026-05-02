@@ -100,7 +100,7 @@ python train_smolvlm.py \
 
 **Key Arguments**
 - `--model_id`: SmolVLM2 model ID (default: `HuggingFaceTB/SmolVLM2-500M-Video-Instruct`).
-- `--epochs`: Defaults to 100 for VLM fine-tuning.
+- `--epochs`: Defaults to 100 since VLM fine-tuning typically converges more slowly than TimeSformer.
 - `--batch_size`: Tune based on available VRAM (e.g., 4 for 12GB-class GPUs).
 
 Output model is saved to `output_dir/final`.
