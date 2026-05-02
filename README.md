@@ -1,11 +1,12 @@
-This repository contains the implementation for predicting short-form video popularity using **TimeSformer** and **SmolVLM2** with Parameter-Efficient Fine-Tuning (PEFT/QLoRA).
+# Short-Video Popularity Prediction Using Video Transformers and VLMs
 
+Predict short-form video popularity with a video transformer (TimeSformer) and a vision-language model (SmolVLM2) using parameter-efficient fine-tuning (QLoRA). The training pipeline normalizes a popularity metric, labels the top and bottom quantiles as popular/not-popular, and trains lightweight classifiers on video clips.
 
-
-## Features
-* **TimeSformer + QLoRA**: Efficient video transformer fine-tuning.
-* **SmolVLM2 Classifier**: Adapting a Vision-Language Model for discriminative video classification.
-* **Memory Optimized**: Support for 4-bit quantization and gradient checkpointing.
+## Highlights
+- **TimeSformer + QLoRA**: Efficient 4-bit fine-tuning of a video transformer.
+- **SmolVLM2 classifier**: Adapts a vision-language model for discriminative video classification.
+- **Quantile-based labeling**: Normalized metric with top/bottom quantiles mapped to labels.
+- **Built-in evaluation**: Accuracy, weighted F1, precision, and recall.
 
 ## 📂 Project Structure
 
@@ -16,7 +17,7 @@ This repository contains the implementation for predicting short-form video popu
 │   └── smolvlm.py        # SmolVLM2 classification wrapper
 ├── data/                 # Dataset loading and processing
 │   ├── __init__.py
-│   └── dataset.py        # Custom Dataset classes and Collators
+│   └── dataset.py        # Custom Dataset classes and collators
 ├── utils/                # Utility scripts
 │   ├── __init__.py
 │   └── metrics.py        # Evaluation metrics (Accuracy, F1, etc.)
@@ -24,60 +25,49 @@ This repository contains the implementation for predicting short-form video popu
 ├── train_smolvlm.py      # CLI training script for SmolVLM2
 ├── requirements.txt      # Python dependencies
 └── README.md             # Project documentation
-
 ```
 
 ## 🚀 Installation
 
 ### Prerequisites
-
-* Python 3.8+
-* CUDA-compatible GPU (Recommended: 24GB VRAM for full fine-tuning, 12GB+ for QLoRA)
+- Python 3.8+
+- CUDA-compatible GPU (recommended: 12GB+ for QLoRA, 24GB+ for full fine-tuning)
 
 ### Setup
 
-1. **Clone the repository:**
 ```bash
 git clone https://github.com/Kartik-Swt/Short-Video-Popularity-Prediction-Using-Video-Transformers-and-VLMs.git
-cd video-popularity-prediction
-
-```
-
-
-2. **Install dependencies:**
-```bash
+cd Short-Video-Popularity-Prediction-Using-Video-Transformers-and-VLMs
 pip install -r requirements.txt
-
 ```
 
-
+> **Weights & Biases**: Training logs are sent to W&B by default. Set `WANDB_DISABLED=true` to disable logging or run `wandb login` before training.
 
 ## 💾 Datasets
 
-This project utilizes two primary datasets for short-form video analysis. Please download them from the sources below and ensure they are accessible to the training scripts.
+This project expects a CSV with video paths and a popularity metric column. Two example sources:
 
 ### 1. YouTube Shorts Dataset
-
-A curated collection of YouTube Shorts with associated metadata and popularity metrics.
-
-* **Download:** [Google Drive Link](https://drive.google.com/file/d/1aDJftxei6qqjHREEGgRQ8rCFfwRemw1Q/view?usp=sharing)
-* **Format:** CSV containing video paths and engagement metrics.
+- **Download:** [Google Drive Link](https://drive.google.com/file/d/1aDJftxei6qqjHREEGgRQ8rCFfwRemw1Q/view?usp=sharing)
+- **Format:** CSV containing video paths and engagement metrics.
 
 ### 2. Snapchat UGC Dataset
+- **Source:** [SnapUGC_Engagement GitHub](https://github.com/dasongli1/SnapUGC_Engagement.git)
 
-Derived from the SnapUGC Engagement dataset.
+### CSV Requirements
+- A video path column (default: `video_path`).
+- A popularity metric column (default: `ECR`).
+- Videos must be accessible at the paths referenced in the CSV.
 
-* **Source:** [SnapUGC_Engagement GitHub](https://github.com/dasongli1/SnapUGC_Engagement.git)
-* **Note:** Please follow the instructions in the linked repository to download the raw video files and metadata.
-
-**Preprocessing Note:**
-Ensure your CSV files have a column for the video file path (e.g., `video_path`) and a metric column (e.g., `ECR` or `popularity_score`) before running the training scripts. The scripts handle normalization and quantile-based labeling automatically.
+### Labeling Logic
+The loader normalizes the metric column and assigns labels based on quantiles:
+- **popular**: top 33% (default)
+- **not_popular**: bottom 33%
+- The middle quantile is filtered out to create a cleaner binary split.
 
 ## 🛠️ Usage
 
 ### Training TimeSformer
-
-To train the TimeSformer model using QLoRA 4-bit quantization:
 
 ```bash
 python train_timesformer.py \
@@ -87,40 +77,42 @@ python train_timesformer.py \
   --epochs 20 \
   --batch_size 8 \
   --output_dir ./checkpoints/timesformer
-
 ```
 
-**Key Arguments:**
+**Key Arguments**
+- `--model_id`: Base model ID (default: `facebook/timesformer-base-finetuned-k400`).
+- `--metric_col`: CSV column used to compute popularity labels.
+- `--lr`: Learning rate (default: `5e-5`).
 
-* `--model_id`: Base HuggingFace model (default: `facebook/timesformer-base-finetuned-k400`).
-* `--metric_col`: The column name in CSV used to determine popularity (e.g., `ECR`, `views`).
+Output model is saved to `output_dir/final_model`.
 
 ### Training SmolVLM2
-
-To train the Vision-Language Model (SmolVLM2) for discriminative classification:
 
 ```bash
 python train_smolvlm.py \
   --csv_path ./path/to/data.csv \
   --video_col video_path \
   --model_id HuggingFaceTB/SmolVLM2-500M-Video-Instruct \
-  --epochs 50 \
-  --batch_size 4 \
+  --epochs 100 \
+  --batch_size 8 \
   --output_dir ./checkpoints/smolvlm
-
 ```
 
-**Key Arguments:**
+**Key Arguments**
+- `--model_id`: SmolVLM2 model ID (default: `HuggingFaceTB/SmolVLM2-500M-Video-Instruct`).
+- `--epochs`: Defaults to 100 for VLM fine-tuning.
 
-* `--model_id`: Choose between `500M` (faster) or `2.2B` variants.
-* `--epochs`: VLM fine-tuning typically requires more epochs for convergence.
+Output model is saved to `output_dir/final`.
 
-## 📊 Results & Metrics
+## 📊 Evaluation
 
-The models are evaluated using the following metrics on a held-out test set:
+Evaluation runs automatically after training. Metrics include:
+- **Accuracy**
+- **F1-Score (Weighted)**
+- **Precision & Recall (Weighted)**
 
-* **Accuracy**
-* **F1-Score (Weighted)**
-* **Precision & Recall (Weighted)**
+The best checkpoint is selected based on **F1-Score**.
 
-Evaluation is performed automatically after training completes. Best checkpoints are saved based on the **F1-Score**.
+## 🔍 Notes
+- Each video is sampled to 8 frames for both pipelines.
+- Train/validation/test splits are stratified with a fixed random seed for reproducibility.
