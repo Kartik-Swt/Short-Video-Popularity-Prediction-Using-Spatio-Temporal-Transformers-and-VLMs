@@ -94,13 +94,14 @@ python train_smolvlm.py \
   --video_col video_path \
   --model_id HuggingFaceTB/SmolVLM2-500M-Video-Instruct \
   --epochs 100 \
-  --batch_size 8 \
+  --batch_size 4 \
   --output_dir ./checkpoints/smolvlm
 ```
 
 **Key Arguments**
 - `--model_id`: SmolVLM2 model ID (default: `HuggingFaceTB/SmolVLM2-500M-Video-Instruct`).
 - `--epochs`: Defaults to 100 for VLM fine-tuning.
+- `--batch_size`: Tune based on available VRAM (e.g., 4 for 12GB-class GPUs).
 
 Output model is saved to `output_dir/final`.
 
